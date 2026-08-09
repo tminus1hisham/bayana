@@ -39,15 +39,21 @@ class ErrorRetryView extends StatelessWidget {
 }
 
 class EmptyView extends StatelessWidget {
-  const EmptyView({super.key, required this.title, required this.message});
+  const EmptyView({
+    super.key,
+    required this.title,
+    required this.message,
+    this.icon = Icons.search_off_rounded,
+  });
 
   final String title;
   final String message;
+  final IconData icon;
 
   @override
   Widget build(BuildContext context) {
     return _CenteredMessage(
-      icon: Icons.search_off_rounded,
+      icon: icon,
       iconColor: Theme.of(context).colorScheme.onSurfaceVariant,
       title: title,
       message: message,

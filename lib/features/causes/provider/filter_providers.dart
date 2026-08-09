@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../model/cause.dart';
 import '../model/cause_category.dart';
 import 'cause_providers.dart';
+import 'favorites_provider.dart';
 
 final searchQueryProvider = NotifierProvider<SearchQueryNotifier, String>(
   SearchQueryNotifier.new,
@@ -29,17 +30,32 @@ class SelectedCategoryNotifier extends Notifier<CauseCategory?> {
   void select(CauseCategory? category) => state = category;
 }
 
+final showFavoritesOnlyProvider =
+    NotifierProvider<ShowFavoritesOnlyNotifier, bool>(
+      ShowFavoritesOnlyNotifier.new,
+    );
+
+class ShowFavoritesOnlyNotifier extends Notifier<bool> {
+  @override
+  bool build() => false;
+
+  void update(bool value) => state = value;
+}
+
 final filteredCausesProvider = Provider<AsyncValue<List<Cause>>>((ref) {
   final causes = ref.watch(causeListProvider);
   final query = ref.watch(searchQueryProvider).trim().toLowerCase();
   final category = ref.watch(selectedCategoryProvider);
+  final favoritesOnly = ref.watch(showFavoritesOnlyProvider);
+  final favorites = ref.watch(favoritesProvider);
 
   return causes.whenData((list) {
     return list.where((cause) {
       final matchesQuery =
           query.isEmpty || cause.title.toLowerCase().contains(query);
       final matchesCategory = category == null || cause.category == category;
-      return matchesQuery && matchesCategory;
+      final matchesFavorites = !favoritesOnly || favorites.contains(cause.id);
+      return matchesQuery && matchesCategory && matchesFavorites;
     }).toList(growable: false);
   });
 });
