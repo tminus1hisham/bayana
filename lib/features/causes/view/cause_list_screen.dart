@@ -4,7 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
 import '../model/cause.dart';
 import '../provider/cause_providers.dart';
+import '../provider/filter_providers.dart';
+import '../widget/category_chips.dart';
 import '../widget/cause_card.dart';
+import '../widget/search_field.dart';
 import '../widget/state_views.dart';
 
 class CauseListScreen extends ConsumerWidget {
@@ -12,20 +15,33 @@ class CauseListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final causes = ref.watch(causeListProvider);
+    final causes = ref.watch(filteredCausesProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Cause Explorer')),
-      body: causes.when(
-        loading: LoadingView.new,
-        error: (error, _) => ErrorRetryView(
-          error: error,
-          onRetry: ref.read(causeListProvider.notifier).reload,
-        ),
-        data: (list) => RefreshIndicator(
-          onRefresh: ref.read(causeListProvider.notifier).reload,
-          child: _CauseList(list),
-        ),
+      body: Column(
+        children: [
+          const Padding(
+            padding: AppTheme.pagePadding,
+            child: SearchField(),
+          ),
+          const SizedBox(height: 12),
+          const CategoryChips(),
+          const SizedBox(height: 4),
+          Expanded(
+            child: causes.when(
+              loading: LoadingView.new,
+              error: (error, _) => ErrorRetryView(
+                error: error,
+                onRetry: ref.read(causeListProvider.notifier).reload,
+              ),
+              data: (list) => RefreshIndicator(
+                onRefresh: ref.read(causeListProvider.notifier).reload,
+                child: _CauseList(list),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
