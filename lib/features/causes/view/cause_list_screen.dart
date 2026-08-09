@@ -19,7 +19,7 @@ class CauseListScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final causes = ref.watch(filteredCausesProvider);
-    final reload = ref.read(causeListProvider.notifier).reload;
+    final notifier = ref.read(causeListProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Cause Explorer')),
@@ -42,11 +42,11 @@ class CauseListScreen extends ConsumerWidget {
             child: causes.when(
               loading: LoadingView.new,
               error: (error, _) =>
-                  ErrorRetryView(error: error, onRetry: reload),
+                  ErrorRetryView(error: error, onRetry: notifier.retry),
               data: (list) => list.isEmpty
                   ? const _EmptyResults()
                   : RefreshIndicator(
-                      onRefresh: reload,
+                      onRefresh: notifier.refresh,
                       child: _CauseList(list),
                     ),
             ),

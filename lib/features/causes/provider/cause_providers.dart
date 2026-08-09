@@ -20,16 +20,22 @@ final causeRepositoryProvider = Provider<CauseRepository>(
   (ref) => RemoteCauseRepository(ref.watch(causeApiProvider)),
 );
 
+// Riverpod retries failed providers on its own; recovery here is the retry button.
 final causeListProvider = AsyncNotifierProvider<CauseListNotifier, List<Cause>>(
   CauseListNotifier.new,
+  retry: (_, _) => null,
 );
 
 class CauseListNotifier extends AsyncNotifier<List<Cause>> {
   @override
   Future<List<Cause>> build() => ref.watch(causeRepositoryProvider).getCauses();
 
-  Future<void> reload() async {
-    state = const AsyncValue.loading();
+  Future<void> refresh() async {
     state = await AsyncValue.guard(ref.read(causeRepositoryProvider).getCauses);
+  }
+
+  Future<void> retry() async {
+    state = const AsyncValue.loading();
+    await refresh();
   }
 }
