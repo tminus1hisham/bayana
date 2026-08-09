@@ -11,6 +11,7 @@ import '../widget/cause_card.dart';
 import '../widget/scope_switcher.dart';
 import '../widget/search_field.dart';
 import '../widget/state_views.dart';
+import 'cause_detail_screen.dart';
 
 class CauseListScreen extends ConsumerWidget {
   const CauseListScreen({super.key});
@@ -68,7 +69,14 @@ class _CauseList extends StatelessWidget {
       physics: const AlwaysScrollableScrollPhysics(),
       itemCount: causes.length,
       separatorBuilder: (_, _) => const SizedBox(height: 12),
-      itemBuilder: (context, index) => CauseCard(cause: causes[index]),
+      itemBuilder: (context, index) {
+        final cause = causes[index];
+        return CauseCard(
+          cause: cause,
+          onTap: () =>
+              Navigator.of(context).push(CauseDetailScreen.route(cause)),
+        );
+      },
     );
   }
 }
