@@ -6,6 +6,7 @@ import '../model/cause.dart';
 import '../widget/cause_image.dart';
 import '../widget/category_tag.dart';
 import '../widget/favorite_button.dart';
+import '../widget/rounded_backdrop.dart';
 
 class CauseDetailScreen extends StatelessWidget {
   const CauseDetailScreen({super.key, required this.cause});
@@ -31,14 +32,14 @@ class CauseDetailScreen extends StatelessWidget {
             actions: [
               Padding(
                 padding: const EdgeInsets.only(right: 8),
-                child: _RoundedBackdrop(
+                child: RoundedBackdrop(
                   child: FavoriteButton(causeId: cause.id),
                 ),
               ),
             ],
             leading: Padding(
               padding: const EdgeInsets.only(left: 8),
-              child: _RoundedBackdrop(
+              child: RoundedBackdrop(
                 child: IconButton(
                   icon: const Icon(Icons.arrow_back),
                   tooltip: 'Back',
@@ -73,23 +74,6 @@ class CauseDetailScreen extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _RoundedBackdrop extends StatelessWidget {
-  const _RoundedBackdrop({required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.75),
-        shape: BoxShape.circle,
-      ),
-      child: child,
     );
   }
 }

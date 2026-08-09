@@ -60,21 +60,59 @@ class CauseListScreen extends ConsumerWidget {
 class _CauseList extends StatelessWidget {
   const _CauseList(this.causes);
 
+  static const _gridBreakpoint = 600.0;
+  static const _spacing = 12.0;
+
   final List<Cause> causes;
+
+  void _open(BuildContext context, Cause cause) {
+    Navigator.of(context).push(CauseDetailScreen.route(cause));
+  }
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      padding: AppTheme.pagePadding.copyWith(top: 8, bottom: 24),
-      physics: const AlwaysScrollableScrollPhysics(),
-      itemCount: causes.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 12),
-      itemBuilder: (context, index) {
-        final cause = causes[index];
-        return CauseCard(
-          cause: cause,
-          onTap: () =>
-              Navigator.of(context).push(CauseDetailScreen.route(cause)),
+    final padding = AppTheme.pagePadding.copyWith(top: 8, bottom: 24);
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < _gridBreakpoint) {
+          return ListView.separated(
+            padding: padding,
+            physics: const AlwaysScrollableScrollPhysics(),
+            itemCount: causes.length,
+            separatorBuilder: (_, _) => const SizedBox(height: _spacing),
+            itemBuilder: (context, index) => CauseCard(
+              cause: causes[index],
+              onTap: () => _open(context, causes[index]),
+            ),
+          );
+        }
+
+        final columns = switch (constraints.maxWidth) {
+          >= 1200 => 4,
+          >= 900 => 3,
+          _ => 2,
+        };
+        final tileWidth =
+            (constraints.maxWidth -
+                padding.horizontal -
+                _spacing * (columns - 1)) /
+            columns;
+
+        return GridView.builder(
+          padding: padding,
+          physics: const AlwaysScrollableScrollPhysics(),
+          itemCount: causes.length,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: columns,
+            crossAxisSpacing: _spacing,
+            mainAxisSpacing: _spacing,
+            mainAxisExtent: tileWidth * 9 / 16 + 140,
+          ),
+          itemBuilder: (context, index) => CauseGridCard(
+            cause: causes[index],
+            onTap: () => _open(context, causes[index]),
+          ),
         );
       },
     );
